@@ -6,77 +6,91 @@
     <title>WORKSHOP STORES INVENTORY</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background-color: #0a192f; color: #e6f1ff; }
-        .container { max-width: 1000px; margin: auto; background: #112240; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #233554; position: relative; }
-        .logo-badge { position: absolute; top: 20px; right: 20px; width: 60px; height: auto; border-radius: 4px; }
-        h1 { color: #ffffff; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-size: 1.8em; }
-        .subtitle { color: #8892b0; margin-bottom: 20px; font-size: 0.9em; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 10px; background-color: #0a192f; color: #e6f1ff; }
+        .container { max-width: 1000px; margin: auto; background: #112240; padding: 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #233554; position: relative; }
+        
+        /* Branding */
+        .logo-badge { position: absolute; top: 15px; right: 15px; width: 50px; height: auto; border-radius: 4px; }
+        h1 { color: #ffffff; margin: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 1.4em; padding-right: 60px; }
+        .subtitle { color: #8892b0; margin-bottom: 15px; font-size: 0.8em; }
         .subtitle a { color: #64ffda; text-decoration: none; }
-        #reader { width: 100%; border: 2px dashed #64ffda; border-radius: 8px; margin-bottom: 20px; background: #0a192f; }
+
+        /* Scanner Styling */
+        #reader { width: 100%; border: 2px dashed #64ffda; border-radius: 8px; margin-bottom: 15px; background: #000; overflow: hidden; }
         
-        /* Modals */
-        #stockCheckModal, #newItemModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1d2d50; padding: 25px; border-radius: 12px; border: 2px solid #64ffda; z-index: 1000; box-shadow: 0 0 50px rgba(0,0,0,0.8); width: 320px; text-align: center; }
-        #modalOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; }
-        
-        input { padding: 12px; border-radius: 4px; border: 1px solid #233554; background: #0a192f; color: white; width: 85%; margin-bottom: 10px; font-size: 1em; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
-        th, td { border: 1px solid #233554; padding: 12px; text-align: left; }
+        /* Search and Table */
+        input#searchInput { padding: 12px; border-radius: 4px; border: 1px solid #233554; background: #0a192f; color: white; width: calc(100% - 26px); margin-bottom: 15px; font-size: 1em; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+        th, td { border: 1px solid #233554; padding: 10px; text-align: left; }
         th { background-color: #1d2d50; color: #64ffda; text-transform: uppercase; }
         .critical { background-color: #441a1a !important; color: #ff6b6b; font-weight: bold; }
-        .timestamp { color: #8892b0; font-size: 0.8em; font-style: italic; }
-        
-        .btn { padding: 12px 20px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.3s; margin: 5px; text-transform: uppercase; }
-        .btn-sync { background: #64ffda; color: #0a192f; width: 100%; font-size: 1.1em; margin-top: 25px; }
-        .btn-save { background: #64ffda; color: #0a192f; }
+        .timestamp { color: #8892b0; font-size: 0.75em; font-style: italic; }
+
+        /* Modals */
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1d2d50; padding: 20px; border-radius: 12px; border: 2px solid #64ffda; z-index: 1000; box-shadow: 0 0 50px rgba(0,0,0,0.9); width: 85%; max-width: 320px; text-align: center; }
+        #modalOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; }
+        .modal input { width: 90%; margin-bottom: 10px; padding: 10px; background: #0a192f; border: 1px solid #233554; color: white; border-radius: 4px; }
+
+        /* Buttons */
+        .btn { padding: 12px 20px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; text-transform: uppercase; transition: 0.2s; }
+        .btn-sync { background: #64ffda; color: #0a192f; width: 100%; font-size: 1.1em; margin-top: 20px; }
+        .btn-save { background: #64ffda; color: #0a192f; margin-right: 5px; }
         .btn-cancel { background: #8892b0; color: #0a192f; }
         
-        footer { text-align: center; margin-top: 40px; color: #8892b0; font-size: 0.85em; border-top: 1px solid #233554; padding-top: 20px; }
+        footer { text-align: center; margin-top: 30px; color: #8892b0; font-size: 0.8em; border-top: 1px solid #233554; padding-top: 15px; }
     </style>
 </head>
 <body>
 
 <div id="modalOverlay"></div>
 
-<div id="stockCheckModal">
+<div id="stockCheckModal" class="modal">
     <h3 style="color:#64ffda">STOCK CHECK</h3>
-    <p id="modalItemName" style="margin-bottom:5px; font-weight: bold;"></p>
-    <input type="number" id="newQty" placeholder="Actual Count on Shelf">
-    <button class="btn btn-save" onclick="updateStock()">Confirm</button>
-    <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+    <p id="modalItemName" style="font-weight: bold;"></p>
+    <input type="number" id="newQty" placeholder="Actual Quantity Counted" inputmode="numeric">
+    <div style="margin-top:10px;">
+        <button class="btn btn-save" onclick="updateStock()">Confirm</button>
+        <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
 </div>
 
-<div id="newItemModal">
-    <h3 style="color:#64ffda">ADD NEW PART</h3>
+<div id="newItemModal" class="modal">
+    <h3 style="color:#64ffda">NEW PART DETECTED</h3>
     <input type="text" id="newPartBC" readonly style="opacity: 0.6;">
-    <input type="text" id="newPartNo" placeholder="Part Number">
+    <input type="text" id="newPartNo" placeholder="Part Number (e.g. BC-101)">
     <input type="text" id="newPartDesc" placeholder="Description">
-    <input type="number" id="newPartMin" placeholder="Min Stock Level">
-    <button class="btn btn-save" onclick="addNewItem()">Add to List</button>
-    <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+    <input type="number" id="newPartMin" placeholder="Min. Required Level" inputmode="numeric">
+    <div style="margin-top:10px;">
+        <button class="btn btn-save" onclick="addNewItem()">Add Item</button>
+        <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
 </div>
 
 <div class="container">
-    <img src="https://www.blucomputers.co.uk/gallery_gen/cd6f202757dcc4e33c805062d83679ca_fit.png?ts=1766441461" alt="Logo" class="logo-badge">
+    <img src="https://www.blucomputers.co.uk/gallery_gen/cd6f202757dcc4e33c805062d83679ca_fit.png?ts=1766441461" class="logo-badge">
     <h1>WORKSHOP STORES INVENTORY</h1>
     <div class="subtitle">Powered & Supplied By <a href="https://blucomputers.co.uk" target="_blank">Blucomputers.co.uk</a></div>
     
     <div id="reader"></div>
 
-    <input type="text" id="searchInput" placeholder="Search Inventory..." onkeyup="filterTable()" style="width: 97%;">
+    <input type="text" id="searchInput" placeholder="Quick Search Part or Description..." onkeyup="filterTable()">
     
-    <table id="inventoryTable">
-        <thead>
-            <tr>
-                <th>Part #</th>
-                <th>Description</th>
-                <th>Stock</th>
-                <th>Min</th>
-                <th>Last Checked</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
+    <div style="overflow-x: auto;">
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>Part #</th>
+                    <th>Description</th>
+                    <th>Stock</th>
+                    <th>Min</th>
+                    <th>Last Check</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
 
     <button class="btn btn-sync" onclick="saveToGitHub()">SYNC TO CLOUD</button>
 
@@ -87,7 +101,7 @@
 </div>
 
 <script>
-    // --- GITHUB CONFIGURATION ---
+    // --- GITHUB CONFIG ---
     const GITHUB_USER = "BluComputers"; 
     const GITHUB_REPO = "BCinv";
     const FILE_PATH = "data.json";
@@ -96,32 +110,43 @@
     let fileSha = "";
     let currentScanningItem = null;
 
+    // Load Data
     async function loadFromCloud() {
         try {
             const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
             const response = await fetch(url);
+            if(!response.ok) throw new Error();
             const data = await response.json();
             fileSha = data.sha;
             inventory = JSON.parse(atob(data.content));
             renderTable();
         } catch (e) {
-            console.log("Database file not found or empty.");
+            console.warn("Database empty or not found. Start by scanning an item.");
         }
     }
 
     function renderTable(data = inventory) {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
-        data.sort((a, b) => (a.stock < a.min) ? -1 : 1); // Put low stock at top
-        data.forEach(item => {
+        // Sort: Critical items (low stock) always at the top
+        const sorted = [...data].sort((a, b) => (a.stock < a.min ? -1 : 1));
+        sorted.forEach(item => {
             const isCritical = item.stock < item.min;
             tbody.innerHTML += `<tr class="${isCritical ? 'critical' : ''}">
                 <td>${item.part}</td><td>${item.desc}</td><td>${item.stock}</td><td>${item.min}</td>
-                <td class="timestamp">${item.lastChecked || 'Never'}</td></tr>`;
+                <td class="timestamp">${item.lastChecked || 'N/A'}</td></tr>`;
         });
     }
 
-    const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+    // --- SCANNER LOGIC ---
+    // Using more aggressive settings for mobile focus
+    const html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+        fps: 20, 
+        qrbox: { width: 280, height: 180 },
+        rememberLastUsedCamera: true,
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+    });
+
     html5QrcodeScanner.render((decodedText) => {
         const item = inventory.find(i => i.barcode === decodedText);
         if (item) {
@@ -141,34 +166,40 @@
     }
 
     function closeModal() {
-        document.getElementById('stockCheckModal').style.display = 'none';
-        document.getElementById('newItemModal').style.display = 'none';
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
         document.getElementById('modalOverlay').style.display = 'none';
     }
 
     function updateStock() {
-        const newQty = parseInt(document.getElementById('newQty').value);
-        if (!isNaN(newQty)) {
-            currentScanningItem.stock = newQty;
-            currentScanningItem.lastChecked = new Date().toLocaleString();
+        const val = document.getElementById('newQty').value;
+        if (val !== "") {
+            currentScanningItem.stock = parseInt(val);
+            currentScanningItem.lastChecked = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             renderTable();
             closeModal();
         }
     }
 
     function addNewItem() {
-        const newItem = {
-            barcode: document.getElementById('newPartBC').value,
-            part: document.getElementById('newPartNo').value,
-            desc: document.getElementById('newPartDesc').value,
-            stock: 0,
-            min: parseInt(document.getElementById('newPartMin').value) || 0,
-            supplier: "Blu Computers",
-            lastChecked: new Date().toLocaleString()
-        };
-        inventory.push(newItem);
-        renderTable();
-        closeModal();
+        const pNo = document.getElementById('newPartNo').value;
+        const pDs = document.getElementById('newPartDesc').value;
+        const pMn = document.getElementById('newPartMin').value;
+        
+        if(pNo && pDs) {
+            inventory.push({
+                barcode: document.getElementById('newPartBC').value,
+                part: pNo,
+                desc: pDs,
+                stock: 0,
+                min: parseInt(pMn) || 0,
+                supplier: "Blu Computers",
+                lastChecked: new Date().toLocaleDateString()
+            });
+            renderTable();
+            closeModal();
+        } else {
+            alert("Please enter Part Number and Description");
+        }
     }
 
     function filterTable() {
@@ -177,25 +208,29 @@
     }
 
     async function saveToGitHub() {
-        const token = prompt("Enter GitHub Access Token:");
+        const token = prompt("Please enter your GitHub Access Token:");
         if (!token) return;
 
         const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
-        const response = await fetch(url, {
-            method: "PUT",
-            headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                message: "Workshop Sync: " + new Date().toLocaleString(),
-                content: btoa(JSON.stringify(inventory, null, 2)),
-                sha: fileSha
-            })
-        });
+        try {
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: "Stock Take Update: " + new Date().toLocaleString(),
+                    content: btoa(JSON.stringify(inventory, null, 2)),
+                    sha: fileSha
+                })
+            });
 
-        if (response.ok) {
-            alert("SUCCESS: Database Updated.");
-            loadFromCloud();
-        } else {
-            alert("ERROR: Check token permissions or file path.");
+            if (response.ok) {
+                alert("SYNC SUCCESSFUL");
+                loadFromCloud();
+            } else {
+                alert("SYNC FAILED. Check your token or internet connection.");
+            }
+        } catch (err) {
+            alert("Connection Error.");
         }
     }
 
