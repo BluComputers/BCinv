@@ -12,9 +12,9 @@
     "barcode": "00360302",
     "part": "Wc1",
     "desc": "Office window cleaner",
-    "stock": 0,
+    "stock": 1,
     "min": 0,
     "supplier": "Blu Computers",
-    "lastChecked": "06/03/2026"
+    "lastChecked": "06/03/2026 10:02"
   }
 ]
