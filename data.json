@@ -1,0 +1,11 @@
+[
+  {
+    "barcode": "000000",
+    "part": "EXAMPLE-01",
+    "desc": "Example Part",
+    "stock": 10,
+    "min": 5,
+    "supplier": "Blu Computers",
+    "lastChecked": "2026-03-06 09:00"
+  }
+]
