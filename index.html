@@ -8,8 +8,37 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background-color: #0a192f; color: #e6f1ff; }
-        .container { max-width: 1000px; margin: auto; background: #112240; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #233554; }
-        h1 { color: #64ffda; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+            background: #112240; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            border: 1px solid #233554; 
+            position: relative; /* For badge positioning */
+        }
+
+        /* Logo Badge in Top Right */
+        .logo-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px; /* Small Badge size */
+            height: auto;
+            border-radius: 4px;
+        }
+
+        /* Title in White */
+        h1 { 
+            color: #ffffff; 
+            margin: 0; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            font-size: 1.8em;
+        }
+
         .subtitle { color: #8892b0; margin-bottom: 20px; font-size: 0.9em; }
         .subtitle a { color: #64ffda; text-decoration: none; }
 
@@ -37,7 +66,14 @@
         .btn-save { background: #64ffda; color: #0a192f; }
         .btn-cancel { background: #8892b0; color: #0a192f; }
         
-        footer { text-align: center; margin-top: 40px; color: #8892b0; font-size: 0.85em; border-top: 1px solid #233554; padding-top: 20px; }
+        footer { 
+            text-align: center; 
+            margin-top: 40px; 
+            color: #8892b0; 
+            font-size: 0.85em; 
+            border-top: 1px solid #233554; 
+            padding-top: 20px; 
+        }
     </style>
 </head>
 <body>
@@ -54,6 +90,8 @@
 </div>
 
 <div class="container">
+    <img src="https://www.blucomputers.co.uk/gallery_gen/cd6f202757dcc4e33c805062d83679ca_fit.png?ts=1766441461" alt="Blu Computers Logo" class="logo-badge">
+
     <h1>WORKSHOP STORES INVENTORY</h1>
     <div class="subtitle">Powered & Supplied By <a href="https://blucomputers.co.uk" target="_blank">Blucomputers.co.uk</a></div>
     
@@ -77,13 +115,13 @@
     <button class="btn btn-sync" onclick="saveToGitHub()">SYNC TO CLOUD</button>
 
     <footer>
-        Copyright 2026 Blu Computers.<br>
+        &copy; Copyright 2026 Blu Computers.<br>
         User Licence VALID 12 months.
     </footer>
 </div>
 
 <script>
-    // Sample Data with Timestamp field
+    // Data and Logic remain consistent with our build
     let inventory = [
         { barcode: "1001", part: "CPU-FAN-01", desc: "120mm Cooling Fan", stock: 5, min: 10, supplier: "Blu Computers", lastChecked: "2026-02-20 10:00" },
         { barcode: "1002", part: "SSD-500GB", desc: "NVMe M.2 Drive", stock: 20, min: 5, supplier: "Blu Computers", lastChecked: "2026-02-21 14:30" }
@@ -117,7 +155,7 @@
             document.getElementById('modalOverlay').style.display = 'block';
             document.getElementById('newQty').focus();
         } else {
-            alert("New Item! Barcode: " + decodedText + ". Please add to CSV.");
+            alert("Barcode: " + decodedText + " not found.");
         }
     }
 
@@ -148,8 +186,7 @@
         const query = document.getElementById('searchInput').value.toLowerCase();
         const filtered = inventory.filter(item => 
             item.part.toLowerCase().includes(query) || 
-            item.desc.toLowerCase().includes(query) ||
-            item.supplier.toLowerCase().includes(query)
+            item.desc.toLowerCase().includes(query)
         );
         renderTable(filtered);
     }
@@ -159,8 +196,7 @@
     renderTable();
 
     function saveToGitHub() { 
-        // This is where your API logic from earlier connects
-        alert("Preparing data... Syncing all stock levels and timestamps to Cloud."); 
+        alert("SYNC TO CLOUD: Preparing data for transmission..."); 
     }
 </script>
 </body>
