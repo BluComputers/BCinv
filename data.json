@@ -16,5 +16,14 @@
     "min": 0,
     "supplier": "Blu Computers",
     "lastChecked": "06/03/2026 10:02"
+  },
+  {
+    "barcode": "96198599",
+    "part": "Sq1",
+    "desc": "Fruit squash mini",
+    "stock": 0,
+    "min": 1,
+    "supplier": "Blu Computers",
+    "lastChecked": "06/03/2026"
   }
 ]
